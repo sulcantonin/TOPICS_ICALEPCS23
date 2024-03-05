@@ -14,6 +14,7 @@ To download data and trained models, run following commands
 # Make sure you have git-lfs installed (https://git-lfs.com)
 git lfs install
 git clone https://huggingface.co/sulcan/TEXT_ICALEPCS
+
 ```
 
 To load the downloaded dataset, you need an English word dictionary (*words_alpha.txt*) and *gzip* and *pickle* libraries to open the *text_public.pickle.gzip* file. We mostly work with abstracts, which can be extracted via function *core.get_abstracts*
@@ -71,7 +72,18 @@ Word embedding for all unique tokens was found with [Gensim 4.1.2](https://githu
 
 To search through all papers (abstracts):
 ```python
+from rapidfuzz import fuzz
+import numpy as np
 
+def find_best_match(qk : string, k : dict):
+    qk = qk.lower()
+    # if the word is in dictionary 
+    if qk in k:
+        return k[k.index(qk)]
+    # otherwise, find it
+    score = {k_ : int(fuzz.ratio(qk,k_)) for k_ in k}
+    best = np.argmax(np.array(list(score.values())))
+    return k[best]
 ```
 
 ## Topics
